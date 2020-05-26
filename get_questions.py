@@ -3,7 +3,9 @@ import json
 
 import requests
 
-SAVE_FILE = "questions.json"
+from QuestionDao import QuestionDao, DB_FILE
+
+question_dao = QuestionDao(DB_FILE)
 
 general_knowledge = ["http://freepubquiz.weebly.com/general-knowledge-{}.html".format(x) for x in range(1, 7)]
 food_and_drink = ["http://freepubquiz.weebly.com/food--drink-{}.html".format(x) for x in range(3, 4)]
@@ -40,17 +42,18 @@ def get_questions(urls):
 
 i=1
 
-all_questions["general_knowledge"] = get_questions(general_knowledge)
-all_questions["food_and_drink"] = get_questions(food_and_drink)
-all_questions["film_and_tv"] = get_questions(film_and_tv)
+all_questions["General Knowledge"] = get_questions(general_knowledge)
+all_questions["Food & Drink"] = get_questions(food_and_drink)
+all_questions["Film & TV"] = get_questions(film_and_tv)
 
 out = []
 
 for category, qs in all_questions.items():
-    set_num = 1
+    total_q_no = 1
     for set in qs: # question set
         for num, data in set.items():
-            out.append([data[0], data[1], category, set_num, num])
-        set_num += 1
-with open(SAVE_FILE, "w") as f:
-    json.dump(out, f)
+            question_dao.add_item(data[0], data[1], category, total_q_no)
+            total_q_no += 1
+
+
+question_dao.close()

@@ -37,6 +37,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.comboBox)
 
+        self.spinBox = QSpinBox(self.centralwidget)
+        self.spinBox.setObjectName(u"spinBox")
+        self.spinBox.setValue(5)
+
+        self.horizontalLayout.addWidget(self.spinBox)
+
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 

@@ -1,11 +1,12 @@
 from sys import exit
-import json
 
 from PySide2.QtWidgets import QCheckBox, QTableWidgetItem, QApplication, QMainWindow, QHeaderView
+from PySide2.QtCore import Qt
 
 from main_ui import Ui_MainWindow
+from QuestionDao import QuestionDao, DB_FILE
 
-DATA_FILE = "questions.json"
+questions_dao = QuestionDao(DB_FILE)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -17,30 +18,57 @@ class MainWindow(QMainWindow):
         self.ui.tableWidget.setColumnCount(4)
         self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        questions: dict = json.load(open(DATA_FILE, "r"))
-        headers = ["Lock", "Question", "Answer", "Category", "Set", "No."]
+        headers = ["Lock", "Question", "Answer", "Category", "No.", "ID"]
 
-        self.add_items_to_list(questions)
+        self.ui.tableWidget.setColumnCount(len(headers))
+        self.ui.tableWidget.hideColumn(self.ui.tableWidget.columnCount() - 1)  # hide last column, as this is where its id is stored
 
-        for x in range(0, self.ui.tableWidget.columnCount()):
+        self.ui.comboBox.addItems(questions_dao.get_categories())
+
+        self.ui.pushButton.clicked.connect(self.refresh_button)
+
+        for x in range(len(headers)):
             try:
                 self.ui.tableWidget.setHorizontalHeaderItem(x, QTableWidgetItem(headers[x]))
             except IndexError:  # not given all of the headers, just se the defaults for the others, which are from 1-length
                 continue
 
-    def add_item_to_list(self, question, answer, category, set_num, num, col):
-        self.ui.tableWidget.setCellWidget(col, 0, QCheckBox()) # add check box
-        
-        rows = list(map(QTableWidgetItem, map(str, [question, answer, category.replace("_", " ").title(), set_num, num])))
-        self.ui.tableWidget.setColumnCount(len(rows)+1)
+    def refresh_button(self):
+        category = self.ui.comboBox.currentText()
+        number_to_get = self.ui.spinBox.value()
+
+        locked = []
+        for col in range(self.ui.tableWidget.rowCount()):
+            box: QCheckBox = self.ui.tableWidget.cellWidget(col, 0)
+            if box.checkState() == Qt.CheckState.Checked:
+                locked.append(int(self.ui.tableWidget.item(col, self.ui.tableWidget.columnCount() - 1).text())) # append the last value (ID) of the table, but turn it to int as it is always str
+
+        for id, item in enumerate(locked):
+            locked[id] = questions_dao.get_item(item)
+
+        items = questions_dao.get_n_category(category, number_to_get-len(locked)) # get n items, without those checked included in the number
+        if locked:
+            items += locked
+
+        self.add_items_to_list(items, locked)
+
+    def add_item_to_list(self, id, question, answer, category, num, col, box):
+        if not box: box = QCheckBox()
+        self.ui.tableWidget.setCellWidget(col, 0, box) # add check box
+
+        rows = list(map(QTableWidgetItem, map(str, [question, answer, category, num, id])))
         for row, widget in enumerate(rows):
             self.ui.tableWidget.setItem(col, row+1, widget)
 
-    def add_items_to_list(self, items):
+    def add_items_to_list(self, items, locked=[]):
         self.ui.tableWidget.setRowCount(len(items))
 
         for col, item in enumerate(items):
-            self.add_item_to_list(*item, col)
+            box = None
+            if item in locked:
+                box = QCheckBox()
+                box.setChecked(True)
+            self.add_item_to_list(item[0], item[1], item[2], item[4], item[5], col, box)
 
 if __name__ == "__main__":
     app = QApplication([])
