@@ -53,7 +53,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 772, 497))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 782, 478))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.tableWidget = QTableWidget(self.scrollAreaWidgetContents)
@@ -68,6 +68,21 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.saveButton = QPushButton(self.centralwidget)
+        self.saveButton.setObjectName(u"saveButton")
+
+        self.horizontalLayout_3.addWidget(self.saveButton)
+
+        self.openButton = QPushButton(self.centralwidget)
+        self.openButton.setObjectName(u"openButton")
+
+        self.horizontalLayout_3.addWidget(self.openButton)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -81,5 +96,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Refresh", None))
+        self.saveButton.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+        self.openButton.setText(QCoreApplication.translate("MainWindow", u"Open", None))
     # retranslateUi
 

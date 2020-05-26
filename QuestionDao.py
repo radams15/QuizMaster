@@ -33,7 +33,7 @@ class QuestionDao:
         c.close()
         self.db.commit()
 
-    def read(self, query, *args):
+    def _read(self, query, *args):
         c = self.db.cursor()
         c.execute(query, args)
 
@@ -42,16 +42,19 @@ class QuestionDao:
         return out
 
     def get_all(self):
-        return self.read("SELECT * FROM questions")
+        return self._read("SELECT * FROM questions")
 
     def get_all_category(self, category):
-        return self.read("SELECT * FROM questions WHERE category IS ?", category)
+        return self._read("SELECT * FROM questions WHERE category IS ?", category)
 
     def get_n_category(self, category, n):
-        return self.read("SELECT * FROM questions WHERE category IS ? ORDER BY RANDOM()", category)[0:n]
+        return self._read("SELECT * FROM questions WHERE category IS ? ORDER BY RANDOM()", category)[0:n]
 
     def get_item(self, id):
-        return self.read("SELECT * FROM questions WHERE id IS ?", id)[0]
+        return self._read("SELECT * FROM questions WHERE id IS ?", id)[0]
+
+    def get_items(self, items):
+        return [self.get_item(x) for x in items]
 
     def get_categories(self):
-        return [x[0] for x in self.read("SELECT DISTINCT (category) from questions")]
+        return [x[0] for x in self._read("SELECT DISTINCT (category) from questions")]
